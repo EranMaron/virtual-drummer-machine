@@ -1,0 +1,52 @@
+.mixer {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  height: 30%;
+  padding: 20px 20px;
+  border: 3px solid #eee;
+  border-radius: 12px;
+
+  &__title {
+    font-size: 2.5em;
+    font-weight: 400;
+  }
+
+  &__channels {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    overflow-x: auto;
+  }
+}
+
+.channel {
+  margin: 10px 20px;
+
+  &--master {
+    margin-left: 100px;
+  }
+
+  &__fader-wrapper {
+    width: 16px;
+    height: 100px;
+    margin: 5px 20px;
+  }
+
+  &__fader {
+    transform: rotate(-90deg);
+    transform-origin: 50px 50px;
+  }
+
+  &__volume-wrapper {
+    width: 100%;
+    text-align: center;
+  }
+
+  &__volume {
+    font-size: 2em;
+  }
+}

@@ -1,9 +1,10 @@
 import { makeObservable, observable, action, computed } from "mobx";
 import { createContext } from "react";
 import sounds from "../sounds";
+// import crowdSound from "../assets/samples/crowd.mp3";
 
 class AudioManager {
-  drumKit = "kitOne";
+  drumKit = "Drum Kit 1";
   channelsStrip = {};
 
   static samples = sounds;
@@ -20,17 +21,25 @@ class AudioManager {
       setVolumeChannel: action,
       sampleKeys: computed,
       drumKits: computed,
-      initialVolume: computed,
     });
   }
 
   initializeAudio() {
     this.ctx.resume();
     window.addEventListener("keydown", e => this.playSound(e.code));
+    // fetch(crowdSound)
+    //   .then(response => response.arrayBuffer())
+    //   .then(arrayBuffer => this.ctx.decodeAudioData(arrayBuffer))
+    //   .then(audioBuffer => {
+    //     const audio = this.ctx.createBufferSource();
+    //     audio.buffer = audioBuffer;
+    //     audio.connect(this.ctx.destination);
+    //     audio.currentTime = 5;
+    //     audio.start();
+    //   });
   }
 
   setDrumKit(kit) {
-    console.log("Set Drum Kit to ", kit);
     this.channelsStrip = {};
     const {
       channelsStrip,
@@ -40,7 +49,7 @@ class AudioManager {
       throw Error(`Kit "${kit}" was not found`);
 
     this.drumKit = kit;
-    this.sampleKeys.map(channel => {
+    this.sampleKeys.forEach(async channel => {
       channelsStrip[channel] = observable({
         volume: initialVolume,
       });
@@ -67,7 +76,7 @@ class AudioManager {
   }
 
   getChannelVolume(channel) {
-    return this.channelsStrip[channel].volume;
+    if (channel) return this.channelsStrip[channel].volume;
   }
 
   get sampleKeys() {
@@ -76,10 +85,6 @@ class AudioManager {
 
   get drumKits() {
     return Object.keys(this.constructor.samples || {});
-  }
-
-  get initialVolume() {
-    return this.constructor.initialVolume;
   }
 
   playSound(key) {
