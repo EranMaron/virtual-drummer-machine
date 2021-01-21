@@ -1,4 +1,5 @@
 .drums {
+  position: relative;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -10,10 +11,9 @@
           align-items: baseline;
   width: 100%;
   height: 70%;
-  background-image: url("../../assets//images/drum_bg.jpg");
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center;
+  opacity: 1;
+  -webkit-animation: fadeIn 3s;
+          animation: fadeIn 3s;
 }
 
 .drums__title {
@@ -28,5 +28,32 @@
   color: #fff;
   background-color: #470064;
   border: none;
+}
+
+.drum-image {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+  width: 50%;
+}
+
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 /*# sourceMappingURL=Drums.css.map */

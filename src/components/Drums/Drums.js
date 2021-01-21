@@ -1,4 +1,5 @@
 import React, { useRef, useContext } from "react";
+import { observer } from "mobx-react";
 import AudioManager from "../../stores/audioManager";
 import "./Drums.css";
 
@@ -26,8 +27,13 @@ function Drums() {
           </option>
         ))}
       </select>
+      <img
+        src={audioManager.drumImages}
+        className='drum-image'
+        alt='Drum Kit'
+      />
     </div>
   );
 }
 
-export default Drums;
+export default observer(Drums);

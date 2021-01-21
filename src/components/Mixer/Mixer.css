@@ -10,6 +10,9 @@
   padding: 20px 20px;
   border: 3px solid #eee;
   border-radius: 12px;
+  opacity: 1;
+  -webkit-animation: fadeIn 3s;
+          animation: fadeIn 3s;
 }
 
 .mixer__title {
@@ -61,5 +64,23 @@
 
 .channel__volume {
   font-size: 2em;
+}
+
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 /*# sourceMappingURL=Mixer.css.map */

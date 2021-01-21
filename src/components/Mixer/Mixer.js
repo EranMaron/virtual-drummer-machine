@@ -10,6 +10,11 @@ function Mixer() {
   const handleSetVolume = (key, e) => {
     audioManager.setVolumeChannel(key, e.target.value);
   };
+
+  const handleSetMasterVolume = e => {
+    audioManager.setMasterVolume(e.target.value);
+  };
+
   return (
     <div className='mixer'>
       <h2 className='mixer__title'>mixer</h2>
@@ -38,6 +43,27 @@ function Mixer() {
             </div>
           </div>
         ))}
+        <div className='channel'>
+          <div className='channel__fader-wrapper'>
+            <div className='channel__fader-wrapper__fader'>
+              <input
+                className='channel__fader'
+                type='range'
+                min='0'
+                max='100'
+                step='0.1'
+                name='master-volume'
+                value={audioManager.getMasterVolume()}
+                onChange={handleSetMasterVolume}
+              />
+            </div>
+          </div>
+          <div className='channel__volume-wrapper'>
+            <label className='channel__volume'>
+              Master {audioManager.getMasterVolume()}
+            </label>
+          </div>
+        </div>
       </div>
     </div>
   );
