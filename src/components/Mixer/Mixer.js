@@ -11,10 +11,10 @@ function Mixer() {
   return (
     <div className='mixer'>
       <h2 className='mixer__title'>mixer</h2>
-      {audioManager.getSamplesKeys.map(key => (
-        <>
+      {audioManager.sampleKeys.map(key => (
+        <React.Fragment key={key}>
           <input
-            defaultValue={audioManager.getInitialVolume}
+            // defaultValue={audioManager.initialVolume}
             className='mixer__fader'
             type='range'
             min='0'
@@ -22,10 +22,11 @@ function Mixer() {
             step='0.1'
             name={key}
             key={key}
+            value={audioManager.getChannelVolume(key)}
             onChange={e => handleSetVolume(key, e)}
           />
           <h3>{audioManager.getChannelVolume(key)}</h3>
-        </>
+        </React.Fragment>
       ))}
     </div>
   );
