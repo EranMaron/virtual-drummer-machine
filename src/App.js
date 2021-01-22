@@ -8,7 +8,7 @@ function App() {
   const [isInitialized, setIsinitialized] = useState(false);
 
   return (
-    <div className='App'>
+    <div className='app'>
       {!isInitialized ? (
         <InitialPage initial={setIsinitialized} />
       ) : (

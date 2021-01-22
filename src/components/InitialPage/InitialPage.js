@@ -3,9 +3,7 @@ import AudioContext from "../../stores/audioManager";
 
 function InitialPage({ initial }) {
   const audioContext = useContext(AudioContext);
-  // const { ctx } = audioContext;
   const handleInitial = () => {
-    // ctx.resume();
     audioContext.initializeAudio();
     initial(true);
   };

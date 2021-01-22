@@ -1,16 +1,16 @@
 const sounds = {
-  kitOne: {
+  "Drum Kit 1": {
     KeyA: require("./assets/samples/kick.wav"),
     KeyS: require("./assets/samples/snare.wav"),
     KeyD: require("./assets/samples/hihat.wav"),
     KeyF: require("./assets/samples/tom.wav"),
   },
-  kitTwo: {
+  "Drum Kit 2": {
     KeyS: require("./assets/samples/tom.wav"),
     KeyD: require("./assets/samples/hihat.wav"),
     KeyF: require("./assets/samples/snare.wav"),
   },
-  kitThree: {
+  "Drum Kit 3": {
     KeyS: require("./assets/samples/tom.wav"),
     KeyD: require("./assets/samples/hihat.wav"),
     KeyF: require("./assets/samples/snare.wav"),
