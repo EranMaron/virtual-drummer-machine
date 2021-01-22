@@ -143,7 +143,6 @@ class AudioManager {
       channelsStrip,
     } = this;
     if (!channelsStrip[key]) return;
-
     const audio = this.ctx.createBufferSource();
     audio.buffer = channelsStrip[key].audio;
     audio.connect(channelsStrip[key].gain);
