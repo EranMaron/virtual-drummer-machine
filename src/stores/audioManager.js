@@ -1,27 +1,35 @@
 import { makeObservable, observable, action, computed } from "mobx";
 import { createContext } from "react";
 import sounds from "../sounds";
+import impulses from "../reverbs";
 import images from "../drumsImages";
 // import crowdSound from "../assets/samples/crowd.mp3";
 
 class AudioManager {
   drumKit = "Drum Kit 1";
-  impulseReverb = "";
   channelsStrip = {};
   masterVolumeBus = {};
   masterVolume = {};
+  masterReverbBus = {};
+  masterReverb = {};
+  impulseReverb = "Greek 7 Echo Hall";
 
   static samples = sounds;
-  static initialVolume = 80;
+  static effects = impulses;
   static images = images;
+  static initialVolume = 80;
 
   constructor() {
     this.ctx = new AudioContext();
+    this.effects = impulses;
     this.masterOut = this.ctx.destination;
     this.masterVolumeBus = this.ctx.createChannelMerger(6);
+    this.masterReverbBus = this.ctx.createChannelMerger(6);
+    this.masterReverb = this.ctx.createConvolver();
     this.masterVolume.volume = this.constructor.initialVolume;
     this.masterVolume.gainNode = this.ctx.createGain();
 
+    this.setReverbEffect(this.impulseReverb);
     this.setDrumKit(this.drumKit);
 
     makeObservable(this, {
@@ -52,15 +60,13 @@ class AudioManager {
     //   });
   }
 
-  // setMasterGroups() {
-  //   const {
-  //     masterGroups,
-  //     constructor: { initialVolume },
-  //   } = this;
-  //   masterGroups = observable({ volume: initialVolume });
-  //   masterGroups.volumeBus = this.ctx.createChannelMerger(6);
-  //   masterGroups.volumeBus.connect(this.masterOut);
-  // }
+  async setReverbEffect() {
+    if (this.impulseReverb === "None") return;
+    this.masterReverb.buffer = await this.getBuffer(
+      this.effects[this.impulseReverb].default,
+    );
+    console.log(this.effects[this.impulseReverb].default);
+  }
 
   setDrumKit(kit) {
     this.channelsStrip = {};
@@ -76,23 +82,19 @@ class AudioManager {
       channelsStrip[channel] = observable({
         volume: initialVolume,
       });
-      let buffer = await this.getBuffer(channel);
+      let buffer = await this.getBuffer(
+        this.constructor.samples[this.drumKit][channel].default,
+      );
       channelsStrip[channel].audio = buffer;
       channelsStrip[channel].gain = this.ctx.createGain();
     });
   }
 
-  async getBuffer(channel) {
-    const response = await fetch(
-      this.constructor.samples[this.drumKit][channel].default,
-    );
+  async getBuffer(path) {
+    const response = await fetch(path);
     const arrayBuffer = await response.arrayBuffer();
     const buffer = await this.ctx.decodeAudioData(arrayBuffer);
     return buffer;
-  }
-
-  setReverbEffect(impulse) {
-    console.log("Set Reverb Effect");
   }
 
   setMasterVolume(value) {
@@ -104,7 +106,6 @@ class AudioManager {
   }
 
   setVolumeChannel(channel, value) {
-    console.log(value / 100);
     this.channelsStrip[channel].volume = value;
     this.channelsStrip[channel].gain.gain.setValueAtTime(
       value / 100,
@@ -113,7 +114,6 @@ class AudioManager {
   }
 
   getMasterVolume() {
-    console.log(this.masterVolume.volume);
     return this.masterVolume.volume;
   }
 
@@ -134,15 +134,25 @@ class AudioManager {
   }
 
   playSound(key) {
-    const { masterOut, masterVolume, masterVolumeBus, channelsStrip } = this;
+    const {
+      masterOut,
+      masterVolume,
+      masterVolumeBus,
+      masterReverb,
+      masterReverbBus,
+      channelsStrip,
+    } = this;
     if (!channelsStrip[key]) return;
-
     const audio = this.ctx.createBufferSource();
     audio.buffer = channelsStrip[key].audio;
     audio.connect(channelsStrip[key].gain);
     channelsStrip[key].gain.connect(masterVolumeBus);
+    channelsStrip[key].gain.connect(masterReverbBus);
+    masterReverbBus.connect(masterReverb);
+    masterReverb.connect(masterVolumeBus);
     masterVolumeBus.connect(masterVolume.gainNode);
     masterVolume.gainNode.connect(masterOut);
+    // masterReverb.connect(masterOut);
     audio.start();
   }
 }
