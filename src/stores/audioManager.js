@@ -11,6 +11,7 @@ class AudioManager {
   masterVolumeBus = {};
   masterVolume = {};
   masterReverbBus = {};
+  masterReverbVolume;
   masterReverb = {};
   impulseReverb = "Greek 7 Echo Hall";
 
@@ -21,18 +22,17 @@ class AudioManager {
 
   constructor() {
     this.ctx = new AudioContext();
-    this.effects = impulses;
     this.masterOut = this.ctx.destination;
-    this.masterVolumeBus = this.ctx.createChannelMerger(6);
-    this.masterVolume.volume = this.constructor.initialVolume;
-    this.masterVolume.gainNode = this.ctx.createGain();
+    this.effects = impulses;
 
+    this.setMasterChnnel();
     this.setReverbEffect(this.impulseReverb);
     this.setDrumKit(this.drumKit);
 
     makeObservable(this, {
       drumKit: observable,
       masterVolume: observable,
+      impulseReverb: observable,
       setDrumKit: action,
       setReverbEffect: action,
       setVolumeChannel: action,
@@ -58,18 +58,27 @@ class AudioManager {
       });
   }
 
+  setMasterChnnel() {
+    this.masterVolumeBus = this.ctx.createChannelMerger(6);
+    this.masterVolume.volume = this.constructor.initialVolume;
+    this.masterVolume.gainNode = this.ctx.createGain();
+    this.masterVolumeBus.connect(this.masterVolume.gainNode);
+    this.masterVolume.gainNode.connect(this.masterOut);
+  }
+
   async setReverbEffect() {
     this.masterReverbBus = this.ctx.createChannelMerger(6);
+    this.masterReverbVolume = this.ctx.createGain();
     this.masterReverb = this.ctx.createConvolver();
-    
+
     if (this.impulseReverb === "None") return;
     this.masterReverb.buffer = await this.getBuffer(
       this.effects[this.impulseReverb].default,
     );
-    
+
     this.masterReverbBus.connect(this.masterReverb);
-    this.masterReverb.connect(this.masterVolumeBus);
-    this.masterReverb.connect(this.masterOut);
+    this.masterReverb.connect(this.masterReverbVolume);
+    this.masterReverbVolume.connect(this.masterVolumeBus);
   }
 
   setDrumKit(kit) {
@@ -138,21 +147,13 @@ class AudioManager {
   }
 
   playSound(key) {
-    const {
-      masterOut,
-      masterVolume,
-      masterVolumeBus,
-      masterReverbBus,
-      channelsStrip,
-    } = this;
+    const { masterVolumeBus, masterReverbBus, channelsStrip } = this;
     if (!channelsStrip[key]) return;
     const audio = this.ctx.createBufferSource();
     audio.buffer = channelsStrip[key].audio;
     audio.connect(channelsStrip[key].gain);
     channelsStrip[key].gain.connect(masterVolumeBus);
     // channelsStrip[key].gain.connect(masterReverbBus);
-    masterVolumeBus.connect(masterVolume.gainNode);
-    masterVolume.gainNode.connect(masterOut);
 
     audio.start();
   }
