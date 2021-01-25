@@ -24,8 +24,6 @@ class AudioManager {
     this.effects = impulses;
     this.masterOut = this.ctx.destination;
     this.masterVolumeBus = this.ctx.createChannelMerger(6);
-    this.masterReverbBus = this.ctx.createChannelMerger(6);
-    this.masterReverb = this.ctx.createConvolver();
     this.masterVolume.volume = this.constructor.initialVolume;
     this.masterVolume.gainNode = this.ctx.createGain();
 
@@ -61,10 +59,15 @@ class AudioManager {
   }
 
   async setReverbEffect() {
+    this.masterReverbBus = this.ctx.createChannelMerger(6);
+    this.masterReverb = this.ctx.createConvolver();
     if (this.impulseReverb === "None") return;
     this.masterReverb.buffer = await this.getBuffer(
       this.effects[this.impulseReverb].default,
     );
+    this.masterReverb.connect(this.masterVolumeBus);
+    this.masterReverbBus.connect(this.masterReverb);
+    this.masterReverb.connect(this.masterOut);
   }
 
   setDrumKit(kit) {
@@ -133,25 +136,16 @@ class AudioManager {
   }
 
   playSound(key) {
-    const {
-      masterOut,
-      masterVolume,
-      masterVolumeBus,
-      masterReverb,
-      masterReverbBus,
-      channelsStrip,
-    } = this;
+    const { masterOut, masterVolume, masterVolumeBus, channelsStrip } = this;
     if (!channelsStrip[key]) return;
     const audio = this.ctx.createBufferSource();
     audio.buffer = channelsStrip[key].audio;
     audio.connect(channelsStrip[key].gain);
     channelsStrip[key].gain.connect(masterVolumeBus);
-    channelsStrip[key].gain.connect(masterReverbBus);
-    masterReverbBus.connect(masterReverb);
-    masterReverb.connect(masterVolumeBus);
+    // channelsStrip[key].gain.connect(this.masterReverbBus);
     masterVolumeBus.connect(masterVolume.gainNode);
     masterVolume.gainNode.connect(masterOut);
-    // masterReverb.connect(masterOut);
+
     audio.start();
   }
 }
