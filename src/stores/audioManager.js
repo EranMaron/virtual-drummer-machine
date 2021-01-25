@@ -3,7 +3,7 @@ import { createContext } from "react";
 import sounds from "../sounds";
 import impulses from "../reverbs";
 import images from "../drumsImages";
-// import crowdSound from "../assets/samples/crowd.mp3";
+import crowdSound from "../assets/samples/crowd.mp3";
 
 class AudioManager {
   drumKit = "Drum Kit 1";
@@ -48,16 +48,16 @@ class AudioManager {
   initializeAudio() {
     this.ctx.resume();
     window.addEventListener("keydown", e => this.playSound(e.code));
-    // fetch(crowdSound)
-    //   .then(response => response.arrayBuffer())
-    //   .then(arrayBuffer => this.ctx.decodeAudioData(arrayBuffer))
-    //   .then(audioBuffer => {
-    //     const audio = this.ctx.createBufferSource();
-    //     audio.buffer = audioBuffer;
-    //     audio.connect(this.ctx.destination);
-    //     audio.currentTime = 0.5;
-    //     audio.start();
-    //   });
+    fetch(crowdSound)
+      .then(response => response.arrayBuffer())
+      .then(arrayBuffer => this.ctx.decodeAudioData(arrayBuffer))
+      .then(audioBuffer => {
+        const audio = this.ctx.createBufferSource();
+        audio.buffer = audioBuffer;
+        audio.connect(this.ctx.destination);
+        audio.currentTime = 0.5;
+        audio.start();
+      });
   }
 
   async setReverbEffect() {
@@ -65,7 +65,6 @@ class AudioManager {
     this.masterReverb.buffer = await this.getBuffer(
       this.effects[this.impulseReverb].default,
     );
-    console.log(this.effects[this.impulseReverb].default);
   }
 
   setDrumKit(kit) {

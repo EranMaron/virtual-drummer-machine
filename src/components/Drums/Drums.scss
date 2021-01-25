@@ -25,11 +25,11 @@
 
 .drum-image {
   position: absolute;
-  top: 0;
+  top: -20px;
   left: 50%;
   transform: translateX(-50%);
-  width: 50%;
-  // height: 100%;
+  // width: 50%;
+  height: 60%;
 }
 
 @keyframes fadeIn {
