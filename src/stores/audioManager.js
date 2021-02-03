@@ -37,6 +37,7 @@ class AudioManager {
       setReverbEffect: action,
       setVolumeChannel: action,
       setMasterVolume: action,
+      connectChannelToReverb: action,
       sampleKeys: computed,
       drumKits: computed,
       drumImages: computed,
@@ -143,6 +144,10 @@ class AudioManager {
 
   getChannelVolume(channel) {
     if (channel) return this.channelsStrip[channel].volume;
+  }
+
+  getchannelReverbStatus(channel) {
+    return this.channelsStrip[channel].reverb;
   }
 
   get sampleKeys() {

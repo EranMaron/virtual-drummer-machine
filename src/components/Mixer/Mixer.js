@@ -45,12 +45,15 @@ function Mixer() {
                 {audioManager.getChannelVolume(key)}
               </label>
             </div>
-            <label htmlFor='rev'>Reverb</label>
-            <input
-              type='checkbox'
-              id='rev'
-              onClick={() => handleClickReverb(key)}
-            />
+            <div>
+              <label htmlFor='rev'>Reverb</label>
+              <input
+                type='checkbox'
+                id='rev'
+                checked={audioManager.getchannelReverbStatus(key)}
+                onChange={() => handleClickReverb(key)}
+              />
+            </div>
           </div>
         ))}
         <div className='channel'>
