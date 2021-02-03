@@ -15,6 +15,10 @@ function Mixer() {
     audioManager.setMasterVolume(e.target.value);
   };
 
+  const handleClickReverb = key => {
+    audioManager.connectChannelToReverb(key);
+  };
+
   return (
     <div className='mixer'>
       <h2 className='mixer__title'>mixer</h2>
@@ -41,6 +45,12 @@ function Mixer() {
                 {audioManager.getChannelVolume(key)}
               </label>
             </div>
+            <label htmlFor='rev'>Reverb</label>
+            <input
+              type='checkbox'
+              id='rev'
+              onClick={() => handleClickReverb(key)}
+            />
           </div>
         ))}
         <div className='channel'>

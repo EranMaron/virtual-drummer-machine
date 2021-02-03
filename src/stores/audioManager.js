@@ -81,10 +81,19 @@ class AudioManager {
     this.masterReverbVolume.connect(this.masterVolumeBus);
   }
 
+  connectChannelToReverb(key) {
+    this.channelsStrip[key].reverb
+      ? this.channelsStrip[key].gain.disconnect(this.masterReverbBus)
+      : this.channelsStrip[key].gain.connect(this.masterReverbBus);
+
+    this.channelsStrip[key].reverb = !this.channelsStrip[key].reverb;
+  }
+
   setDrumKit(kit) {
     this.channelsStrip = {};
     const {
       channelsStrip,
+      masterVolumeBus,
       constructor: { initialVolume },
     } = this;
     if (!(kit in this.constructor.samples))
@@ -94,12 +103,14 @@ class AudioManager {
     this.sampleKeys.forEach(async channel => {
       channelsStrip[channel] = observable({
         volume: initialVolume,
+        reverb: false,
       });
       let buffer = await this.getBuffer(
         this.constructor.samples[this.drumKit][channel].default,
       );
       channelsStrip[channel].audio = buffer;
       channelsStrip[channel].gain = this.ctx.createGain();
+      channelsStrip[channel].gain.connect(masterVolumeBus);
     });
   }
 
@@ -147,13 +158,11 @@ class AudioManager {
   }
 
   playSound(key) {
-    const { masterVolumeBus, masterReverbBus, channelsStrip } = this;
+    const { channelsStrip } = this;
     if (!channelsStrip[key]) return;
     const audio = this.ctx.createBufferSource();
     audio.buffer = channelsStrip[key].audio;
     audio.connect(channelsStrip[key].gain);
-    channelsStrip[key].gain.connect(masterVolumeBus);
-    // channelsStrip[key].gain.connect(masterReverbBus);
 
     audio.start();
   }
