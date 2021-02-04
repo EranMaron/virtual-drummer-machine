@@ -11,7 +11,7 @@ class AudioManager {
   masterVolumeBus = {};
   masterVolume = {};
   masterReverbBus = {};
-  masterReverbVolume;
+  masterReverbVolume = {};
   masterReverb = {};
   impulseReverb = "Greek 7 Echo Hall";
 
@@ -32,11 +32,13 @@ class AudioManager {
     makeObservable(this, {
       drumKit: observable,
       masterVolume: observable,
+      masterReverbVolume: observable,
       impulseReverb: observable,
       setDrumKit: action,
       setReverbEffect: action,
       setVolumeChannel: action,
       setMasterVolume: action,
+      setReverbVolume: action,
       connectChannelToReverb: action,
       sampleKeys: computed,
       drumKits: computed,
@@ -45,7 +47,8 @@ class AudioManager {
   }
 
   initializeAudio() {
-    this.ctx.resume();
+    if (this.ctx.state === "suspended") this.ctx.resume();
+
     window.addEventListener("keydown", e => this.playSound(e.code));
     fetch(crowdSound)
       .then(response => response.arrayBuffer())
@@ -69,7 +72,8 @@ class AudioManager {
 
   async setReverbEffect() {
     this.masterReverbBus = this.ctx.createChannelMerger(6);
-    this.masterReverbVolume = this.ctx.createGain();
+    this.masterReverbVolume.volume = this.constructor.initialVolume;
+    this.masterReverbVolume.gainNode = this.ctx.createGain();
     this.masterReverb = this.ctx.createConvolver();
 
     if (this.impulseReverb === "None") return;
@@ -78,8 +82,8 @@ class AudioManager {
     );
 
     this.masterReverbBus.connect(this.masterReverb);
-    this.masterReverb.connect(this.masterReverbVolume);
-    this.masterReverbVolume.connect(this.masterVolumeBus);
+    this.masterReverb.connect(this.masterReverbVolume.gainNode);
+    this.masterReverbVolume.gainNode.connect(this.masterOut);
   }
 
   connectChannelToReverb(key) {
@@ -91,7 +95,7 @@ class AudioManager {
   }
 
   setDrumKit(kit) {
-    this.channelsStrip = {};
+    // this.channelsStrip = {};
     const {
       channelsStrip,
       masterVolumeBus,
@@ -123,23 +127,36 @@ class AudioManager {
   }
 
   setMasterVolume(value) {
-    this.masterVolume.volume = value;
-    this.masterVolume.gainNode.gain.setValueAtTime(
-      value / 100,
-      this.ctx.currentTime,
+    this.masterVolume.volume = parseFloat(value);
+    this.masterVolume.gainNode.gain.exponentialRampToValueAtTime(
+      parseFloat(value),
+      this.ctx.currentTime + 0.012,
+    );
+  }
+
+  setReverbVolume(value) {
+    this.masterReverbVolume.volume = parseFloat(value);
+    this.masterReverbVolume.gainNode.gain.exponentialRampToValueAtTime(
+      parseFloat(value),
+      this.ctx.currentTime + 0.012,
     );
   }
 
   setVolumeChannel(channel, value) {
-    this.channelsStrip[channel].volume = value;
-    this.channelsStrip[channel].gain.gain.setValueAtTime(
-      value / 100,
-      this.ctx.currentTime,
+    this.channelsStrip[channel].volume = parseFloat(value);
+    this.channelsStrip[channel].gain.gain.exponentialRampToValueAtTime(
+      parseFloat(value),
+      this.ctx.currentTime + 0.012,
     );
   }
 
   getMasterVolume() {
     return this.masterVolume.volume;
+  }
+
+  getReverbVolume() {
+    console.log(this.masterReverbVolume.volume);
+    return this.masterReverbVolume.volume;
   }
 
   getChannelVolume(channel) {
