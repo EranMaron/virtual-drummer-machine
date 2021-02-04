@@ -15,6 +15,10 @@ function Mixer() {
     audioManager.setMasterVolume(e.target.value);
   };
 
+  const handleSetReverbVolume = e => {
+    audioManager.setReverbVolume(e.target.value);
+  };
+
   const handleClickReverb = key => {
     audioManager.connectChannelToReverb(key);
   };
@@ -30,9 +34,9 @@ function Mixer() {
                 <input
                   className='channel__fader'
                   type='range'
-                  min='0'
-                  max='100'
-                  step='0.1'
+                  min='0.01'
+                  max='1'
+                  step='0.01'
                   name={key}
                   key={key}
                   value={audioManager.getChannelVolume(key)}
@@ -62,9 +66,9 @@ function Mixer() {
               <input
                 className='channel__fader'
                 type='range'
-                min='0'
-                max='100'
-                step='0.1'
+                min='0.01'
+                max='1'
+                step='0.01'
                 name='master-volume'
                 value={audioManager.getMasterVolume()}
                 onChange={handleSetMasterVolume}
@@ -77,6 +81,29 @@ function Mixer() {
             </label>
           </div>
         </div>
+        
+        <div className='channel'>
+          <div className='channel__fader-wrapper'>
+            <div className='channel__fader-wrapper__fader'>
+              <input
+                className='channel__fader'
+                type='range'
+                min='0.01'
+                max='1'
+                step='0.01'
+                name='master-volume'
+                value={audioManager.getReverbVolume()}
+                onChange={handleSetReverbVolume}
+              />
+            </div>
+          </div>
+          <div className='channel__volume-wrapper'>
+            <label className='channel__volume'>
+              Reverb {audioManager.getReverbVolume()}
+            </label>
+          </div>
+        </div>
+        
       </div>
     </div>
   );
